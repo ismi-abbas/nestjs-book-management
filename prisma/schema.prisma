@@ -3,26 +3,68 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  posts     Post[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
+model Book {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  author      String
+  genre       String
+  publishYear String
+  isbn        String
+  status      String
+}
+
+model Borrow {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookId   String
+  userId   String
+  borrowAt DateTime @default(now())
+  returnAt DateTime
+  returned Boolean
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookId    String
+  userId    String
+  rating    Int
+  comment   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+  read      Boolean
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
