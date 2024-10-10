@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, UsePipes } from '@nestjs/common';
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
-import { User } from '@prisma/client';
+import { CreateUserDto, createUserSchema, loginSchema } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,13 +21,14 @@ export class AuthController {
   }
 
   @Post('signup')
-  signUp(@Body() user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) {
-    console.log(user.email);
-    return this.authService.signUp(user);
+  @UsePipes(new ZodValidationPipe(createUserSchema))
+  signUp(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signUp(createUserDto);
   }
 
   @Post('login')
-  login() {
-    return this.authService.login();
+  @UsePipes(new ZodValidationPipe(loginSchema))
+  login(@Body() loginDto: CreateUserDto) {
+    return this.authService.login(loginDto);
   }
 }
